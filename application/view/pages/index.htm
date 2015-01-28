@@ -1,0 +1,170 @@
+<div class="container">
+    
+  <div class="header">
+    <h3 class="text-muted">Product Engineer Test Application</h3>
+  </div>
+  
+  <br />
+  
+  <div class="row">
+    <div class="col-md-12">
+      
+      <p class="text-muted">Social Posts <small>(CRUD)</small></p>
+      
+      <pre>{{pubData}}</pre>
+      
+      <table class="table">
+        <tr class="specs">
+          <td>message</td>
+          <td>media</td>
+          <td class="hidden-sm hidden-xs">tags</td>
+          <td>network</td>
+          <td>status</td>
+          <td>options</td>
+        </tr>
+        <tr ng-repeat="post in pubData.response" data-id="{{post.id}}">
+          <td> <b>{{post.content.message}}</b> </td>
+          <td>
+            <span ng-if="post.content.postType == 'photo'">
+              <a href="{{post.content.media.url}}" target="_blank">
+                <span class="hidden-sm hidden-xs">{{post.content.media.fileName}}</span>
+                <span class="hidden-md hidden-lg hidden-xl">{{post.content.postType}}</span>
+              </a>
+            </span>
+            <span ng-if="post.content.postType != 'photo'">
+              {{post.content.postType}}
+            </span>
+          </td>
+          <td class="hidden-sm hidden-xs">
+            <span ng-repeat="tag in post.tags">
+              {{tag}}
+              <span ng-if="$index+1 < post.tags.length">,</span>
+            </span>
+          </td>
+          <td> {{post.content.network}} </td>
+          <td>
+            {{post.status}}
+            <small ng-if="post.scheduled" class="hidden-md hidden-sm hidden-xs">
+              (scheduled for: {{post.scheduled}})
+            </small>
+          </td>
+          <td>
+            <a href="#" class="editPost" data-target="#editPostModal" data-toggle="modal" ng-click="editPost(post.id,$index)">edit</a>
+            <span class="chSep">/</span>
+            <a href="#" class="deletePost" ng-click="deletePost(post.id,$index)">delete</a>
+          </td>
+        </tr>
+        <tr class="newPost">
+          <td colspan=6>
+            <br />
+            <a href="#addPostModal" data-target="#addPostModal" data-toggle="modal" class="pull-right">New post</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    
+    
+    <div class="col-md-12 disabled">
+      
+        <p class="text-muted">Post Impressions <small>(reach graph)</small></p>
+        
+        <pre>{{reachData}}</pre>
+    </div>
+    
+  </div>
+  
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">New post</h4>
+      </div>
+      <div class="modal-body">
+        <form id="addPostForm" role="form">
+          
+          <div class="form-group">
+            <label for="_new_message">Message</label>
+            <input type="text" required=required class="form-control" id="_new_message" placeholder="Message" />
+          </div>
+          
+          <div class="form-group">
+            <label for="_new_media">Media</label>
+            <input type="file" class="form-control" id="_new_media" />
+            <p class="help-block">Upload an image to post (optional)</p>
+          </div>
+          
+          <div class="form-group">
+            <label for="_new_tags">Tags</label>
+            <input type="text" class="form-control" id="_new_tags" placeholder="Tags / keywords (seperate with comma)" />
+          </div>
+          
+          <div class="form-group">
+            <label for="_new_network">Network</label>
+            <select class="form-control" id="_new_network">
+              <option value="facebook">Facebook</option>
+              <option value="twitter">Twitter</option>
+              <option value="instagram">Instragram</option>
+            </select>
+          </div>
+          
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Discard</button>
+        <button type="button" class="btn btn-primary" ng-click="addNewPost()">Publish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editPostModal" tabindex="-1" role="dialog" aria-labelledby="editPostModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Edit post</h4>
+      </div>
+      <div class="modal-body">
+        <form id="editPostForm" role="form">
+          
+          <div class="form-group">
+            <label for="_upd_message">Message</label>
+            <input type="text" value="{{updPost.content.message}}" required=required class="form-control" id="_upd_message" placeholder="Message" />
+          </div>
+          
+          <div class="form-group">
+            <label for="_upd_media">Media</label>
+            <p class="help-block">{{updPost.content.media.fileName}}</p>
+            <input type="file" class="form-control" id="_upd_media" />
+          </div>
+          
+          <div class="form-group">
+            <label for="_upd_tags">Tags</label>
+            <input type="text" value="{{updPost.tags}}" class="form-control" id="_upd_tags" placeholder="Tags / keywords (seperate with comma)" />
+          </div>
+          
+          <div class="form-group">
+            <label for="_upd_network">Network</label>
+            <select class="form-control" id="_upd_network" value="{{updPost.content.network}}">
+              <option value="facebook">Facebook</option>
+              <option value="twitter">Twitter</option>
+              <option value="instagram">Instragram</option>
+            </select>
+          </div>
+          
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancle</button>
+        <button type="button" class="btn btn-primary" ng-click="updatePost()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
